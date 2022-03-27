@@ -1,0 +1,28 @@
+
+function spawn_enemy
+{
+    summon zombie ~ ~ ~
+}
+
+[Tick]
+function main
+{
+    execute as @e[type=armor_stand,distance=..15] run
+    {
+        tp @s ^ ^ ^10
+        tp @s ^ ^ ^10
+        tp @s ^ ^ ^10
+        tp @s ^ ^ ^10
+    }
+
+    execute as @a at @s run function internal:temp/func
+
+    execute as @e[type=armor_stand,distance=..15] run tp @s ^ ^ ^10
+    execute as @e[type=armor_stand,distance=..15] run tp @s ^ ^ ^10
+    execute as @e[type=armor_stand,distance=..15] run tp @s ^ ^ ^10
+    execute as @e[type=armor_stand,distance=..15] run tp @s ^ ^ ^10
+}
+
+function body
+
+if the command is execute, we need to check if it has '{' after the 'run'. if it does, we parse the '{' as function body. 

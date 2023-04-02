@@ -1,0 +1,64 @@
+podwoda na 47 kratek
+l¹d na 3 kratki nad wodê.
+
+(intensity 100%)
+Kamieñ idzie po permadircie, k¹t 55
+permadirt ni¿ej o 3-4 od kamienia, k¹t 40.
+
+Biom forest idzie tam gdzie jest zagêszczenie drzew
+plants - 40 grass, 20 fern, 10 tall grass, 5 tall fern idzie tam gdzie biom leœny, 50% intensity. only grass
+pla¿a 2 kratki nad wod¹.
+
+drzewa na 40-80 per block
+below 30 deg
+only grass
+
+Œcie¿ka: (r: 3-4 PLATEAU_CIRCLE, r czyszczenia: 9)
+- Gravel - 5
+- Dirt:1 - 20
+- Path_Block - 50
+
+Mieszanka roœlin:
+- 50
+- 10
+- 30
+- 5
+
+Export:
+- Stone
+- Trawa
+- Œcie¿ka
+
+PUSTYNIA:
+
+trawa (1 kratka) 2-3 kratki nad rzekami, na tej trawie daæ wysok¹ trawê mix.
+
+
+GÓRY:
+
+210 - 100% œniegu
+200 - blend œniegu
+
+180 - 100% permadirtu na trawie
+175 - blend permadirtu na trawie
+
+taiga >170
+
+
+
+
+
+
+W RESPACKU TO ZROBIC
+
+Mieszanka Trawna: (only on Grass)
+- Grass - 60
+- Dirt:1 - 2
+- 159:5 - 6
+- 159:13 - 2
+- Mossy_Cobblestone - 1
+
+Mieszanka kamienna: (only on Stone)
+- Stone - 15
+- Stone:5 - 5
+- Cobblestone - 2

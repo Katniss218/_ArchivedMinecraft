@@ -1,0 +1,115 @@
+
+v3.0 "This changes everything..."
+
+- Aktualizacja do 1.14.
+- Ca³kowicie nowy teren i lokacje.
+
+- Bugfixy.
+
+
+v2.1 "Additions Update" - (18.11.2018)
+
+- Aktualizacja do 1.13.2.
+- Ca³kowicie nowy, niestandardowy system magii i Many (energii magicznej).
+- Dwóch nowych bossów, z czego jeden ma niestandardowy model 3D.
+- Trzech nowych minibossów.
+- Poprawiono walkê z Nekromant¹.
+- Piêæ nowych questów g³ównych, co wyd³u¿a rogrywkê o kolejn¹ godzinê.
+- Nowe questy poboczne.
+- Nowy typ broni - bronie magiczne (wykorzystuj¹ce Manê).
+- Nowy rodzaj broni palnej - "snajperka".
+- Nowe rodzaje amunicji do broni palnej.
+- Poprawiono efekty wizualne przy strzelaniu z broni palnej.
+- Poprawiono mechanikê broni palnej.
+- Poprawiono detekcjê kolizji pocisków z broni palnej.
+- Nowy, oddzielny system "pocisków" (projectile'i).
+- Bugfixy.
+
+
+v2.0.3 - (28.08.2018)
+
+- Nowy epicki boss.
+- Nowy quest poboczny.
+- Powiêkszenie wiêzienia.
+- Powiêkszenie posiad³oœci Maltorna.
+- Walka z Nekromant¹ ma teraz 2 fazy, w drugiej staje siê szybszy i czêœciej odpala umiejêtnoœci.
+- Nie trzeba ju¿ mieæ wszystkich przedmiotów w tym samym stacku, aby zaliczy³o questa, mo¿na te¿ mieæ ich wiêcej ni¿ trzeba.
+- Poprawiono brzmienie i spójnoœæ dialogów.
+- Du¿o bugfixów.
+- Bugfixy zwi¹zane z multiplayerem.
+
+
+v2.0.2 - (23.08.2018)
+
+- Aktualizacja do 1.13.1.
+
+
+v2.0.1 - (23.08.2018)
+
+- Dodanie nowego rodzaju ³uku.
+- Poprawki i usprawnienia.
+- Trebusz ma teraz animacjê miotania g³azu.
+- Bugfixy.
+- Fix b³êdu uniemo¿liwaj¹cego dalsz¹ rozgrywkê.
+
+
+v2.0 "Overhaul Update" - (22.08.2018)
+
+- Aktualizacja do MC 1.13
+- Dodanie wsparcia dla multiplayera.
+- Dodanie 2 nowych bossów i 3 mini-bossów.
+- Ulepszenie i poprawienie ju¿ istniej¹cych bossów.
+- Dodanie mnóstwa nowych lokacji, przeciwników, questów i NPC.
+- Dodanie nowego rodzaju broni - Hakownicy.
+- Dodanie stacjonarnych Balist i Armat.
+- Dodanie wiêkszej iloœci amuletów.
+- Dodanie wiêkszej iloœci eliksirów.
+- Dodanie niestandardowego systemu tarcz.
+- Dodanie efektów wizualnych po uderzeniu.
+- Overhaul graficzny mobów.
+- Rebalans przedmiotów.
+- Rebalans potworów.
+- Rebalans sklepów.
+- Wielkie zmiany w resourcepacku.
+- Ca³a góra bugfixów i drobnych poprawek.
+- Optymalizacja (wzglêdna, doda³em tak du¿o rzeczy, ¿e i tak mo¿e lagowaæ).
+
+
+v1.1.3 - (21.02.2018):
+
+- Hotfix walki z Janielem. (ponownie)
+- Bugfix Stra¿y Janiela - nie chcia³ odpaliæ specjalnej umiejêtnoœci.
+- Zmiany w resourcepacku.
+- Nowa ikonka na liœcie œwiatów.
+
+
+v1.1.2 - (07.02.2018):
+
+- Hotfix walki z Janielem.
+- Zmiany w resourcepacku.
+
+
+v1.1.1 - (06.02.2018):
+
+- Ulepszono walki z Bossami oraz Mini-Bossami.
+- Dodano w³asne modele skrzynek. (ozdoby)
+- Poprawiono b³¹d w tutorialu.
+
+
+v1.1 "Bossy Update" - (04.02.2018):
+
+- Wyd³u¿enie fabu³y.
+- Dodanie amuletów.
+- Nowy boss i 2 mini-bossów.
+- Rebalans przedmiotów i monet.
+- Wiele wiêcej.
+
+
+v1.0.2 - (28.01.2018):
+
+- Usuniêto klucze z hopperów w wiêzieniu.
+
+
+v1.0.1 - (27.01.2018):
+
+- Naprawiono b³¹d z Bobem.

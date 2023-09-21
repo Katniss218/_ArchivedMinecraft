@@ -1,0 +1,36 @@
+
+options:
+	nopermission_message: "&cI'm sorry, but you don't have permission to perform this command. Please contact the server administrators if you believe that this is an error."
+
+command /rpgentity [<text>] [<text>] [<text>]:
+	trigger:
+		if arg-1 is "spawn":
+			if player has permission "rpg.rpgentity.spawn":
+				if arg-3 is set:
+					set {_count} to arg-3 parsed as integer
+				else:
+					set {_count} to 1
+				loop {_count} times:
+					spawnentity(arg-2, player's location)
+				send "&aSpawned %{_count}% '%arg-2%'(s)."
+			else:
+				send {@nopermission_message} to player
+		if arg-1 is "kill":
+			if player has permission "rpg.rpgentity.kill":
+				if arg-2 is set:
+					loop all entities:
+						set {_tags::*} to string list tag "Tags" of nbt compound of loop-entity
+						set {_mob_id} to {_tags::2}
+						if {_mob_id} is equal to arg-2:
+							kill loop-entity
+			else:
+				send {@nopermission_message} to player
+		if arg-1 is "killall":
+			if player has permission "rpg.rpgentity.killall":
+				loop all entities:
+					set {_tags::*} to string list tag "Tags" of nbt compound of loop-entity
+					set {_mob_id} to {_tags::2}
+					if {_mob_id} is set:
+						kill loop-entity
+			else:
+				send {@nopermission_message} to player

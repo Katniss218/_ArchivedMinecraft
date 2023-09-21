@@ -1,0 +1,130 @@
+
+options:
+	nopermission_message: "&cI'm sorry, but you don't have permission to perform this command. Please contact the server administrators if you believe that this is an error."
+	level_bar_color_full: "&a"
+	level_bar_color_empty: "&8"
+
+
+function repeat_string(s: text, count: integer) :: text:
+	set {_r} to ""
+	loop {_count} times:
+		set {_r} to "%{_r}%%{_s}%"
+	return {_r}
+
+function get_level_progress_bar(player: player, char: text, total_length: integer) :: text:
+	set {_perc} to {xp::%{_player}'s uuid%} / get_max_xp({level::%{_player}'s uuid%})
+	set {_count_full} to floor({_perc} * {_total_length})
+	return "%{@level_bar_color_full}%%repeat_string({_char}, {_count_full})%%{@level_bar_color_empty}%%repeat_string({_char}, {_total_length} - {_count_full})%"
+
+function get_max_xp(level: integer) :: number:
+	return 1 + ({_level} * 5) + (sqrt({_level}) * 35)
+
+function add_xp(player: player, xp: number):
+	if {_xp} is equal to 0:
+		stop
+	add {_xp} to {xp::%{_player}'s uuid%}
+	if {_xp} is greater than 0:
+		set {_xp_for_level} to get_max_xp({level::%{_player}'s uuid%})
+		send "&aYou've gained %{_xp}% xp. (%{xp::%{_player}'s uuid%}% / %get_max_xp({level::%{_player}'s uuid%})%)" to {_player}
+		while {xp::%{_player}'s uuid%} is greater or equal to {_xp_for_level}:
+			add 1 to {level::%{_player}'s uuid%}
+			subtract {_xp_for_level} from {xp::%{_player}'s uuid%}
+			set {_xp_for_level} to get_max_xp({level::%{_player}'s uuid%})
+			send "&a&lLevel up!" to {_player}
+			send "&aYou're now level %{level::%{_player}'s uuid%}%" to {_player}
+		sync_mc_level({_player})
+		stop
+	else:
+		set {_xp_for_level} to get_max_xp({level::%{_player}'s uuid%} - 1)
+		send "&cYou've lost %{_xp}% xp. (%{xp::%{_player}'s uuid%}% / %get_max_xp({level::%{_player}'s uuid%})%)" to {_player}
+		while {xp::%{_player}'s uuid%} is smaller or equal to 0:
+			remove 1 from {level::%{_player}'s uuid%}
+			add {_xp_for_level} to {xp::%{_player}'s uuid%}
+			set {_xp_for_level} to get_max_xp({level::%{_player}'s uuid%} - 1)
+			send "&c&lLevel down." to {_player}
+			send "&cYou're now level %{level::%{_player}'s uuid%}%" to {_player}
+		sync_mc_level({_player})
+		stop
+		
+function sync_mc_level(player: player):
+	set {_perc} to {xp::%{_player}'s uuid%} / get_max_xp({level::%{_player}'s uuid%})
+	set {_player}'s level to {level::%{_player}'s uuid%}
+	set level progress of {_player} to {_perc}
+
+on join:
+	if {xp::%player's uuid%} is not set:
+		set {xp::%player's uuid%} to 0
+	if {level::%player's uuid%} is not set:
+		set {level::%player's uuid%} to 1
+	
+
+on death:
+	if attacker is a player:
+		set {_victim::Tags::*} to string list tag "Tags" of nbt compound of victim
+		set {_mob_id} to {_victim::Tags::2}
+		if {_mob_id} is set:
+			set {_xp} to get_number_in_range({rpg::loot_tabledef::%{rpg::entitydef::%{_mob_id}%::loot_table}%::xp})
+			add_xp(attacker, {_xp})
+				
+command /xp [<text>] [<text>] [<text>]:
+	trigger:
+		if arg-1 is not set:
+			if {xp::%player's uuid%} is not set:
+				set {xp::%player's uuid%} to 0
+			if {level::%player's uuid%} is not set:
+				set {level::%player's uuid%} to 1
+			if player has permission "rpg.xp.view.self":
+				send "&aYour level: %{level::%player's uuid%}%" to player
+				send "&aYour xp: %{xp::%player's uuid%}% / %get_max_xp({level::%player's uuid%})%" to player
+				#send get_level_progress_bar(player, "|", 50) to player
+			else:
+				send {@nopermission_message} to player
+			stop
+		if arg-1 is "reset":
+			if player has permission "rpg.xp.modify":
+				if arg-2 is not set:
+					set {_target} to player
+				else:
+					set {_target} to arg-2 parsed as player
+				set {xp::%{_target}'s uuid%} to 0
+				set {level::%{_target}'s uuid%} to 1
+				send "&aReset experience of %{_target}%." to player
+			else:
+				send {@nopermission_message} to player
+			stop
+		if arg-1 is "add":
+			if player has permission "rpg.xp.modify":
+				if arg-3 is not set:
+					set {_target} to player
+					set {_amount} to arg-2 parsed as number
+				else:
+					set {_target} to arg-2 parsed as player
+					set {_amount} to arg-3 parsed as number
+				add_xp({_target}, {_amount})
+				send "&aAdded %{_amount}% experience to %{_target}%." to player
+			else:
+				send {@nopermission_message} to player
+			stop
+		if arg-1 is "remove":
+			if player has permission "rpg.xp.modify":
+				if arg-3 is not set:
+					set {_target} to player
+					set {_amount} to (arg-2 parsed as number)
+				else:
+					set {_target} to arg-2 parsed as player
+					set {_amount} to (arg-3 parsed as number)
+				add_xp({_target}, 0 - {_amount})
+				send "&aRemoved %{_amount}% experience from %{_target}%." to player
+			else:
+				send {@nopermission_message} to player
+			stop
+		if player has permission "rpg.xp.view.others":
+			set {_player} to arg-1 parsed as a player
+			if {xp::%{_player}'s uuid%} is not set:
+				send "&cUnknown player %arg-1%" to player
+				stop
+			send "&a%{_player}%'s level: %{level::%{_player}'s uuid%}%" to player
+			send "&a%{_player}%'s xp: %{xp::%{_player}'s uuid%}% / %get_max_xp({level::%{_player}'s uuid%})%" to player
+			#send get_level_progress_bar({_player}, "|", 50) to player
+		else:
+			send {@nopermission_message} to player

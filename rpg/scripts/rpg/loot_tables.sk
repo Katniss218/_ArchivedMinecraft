@@ -1,0 +1,28 @@
+
+function drop_loot_table(loot_table_id: text, loc: location):
+	loop {rpg::loot_tabledef::%{_loot_table_id}%::items::*}:
+	
+		set {_drop_data::*} to loop-value split at "|"
+		set {_drop_amounts} to {_drop_data::1}
+		set {_drop_prefixes::*} to {_drop_data::2} split at ","
+		set {_drop_item} to {_drop_data::3}
+		set {_drop_chance} to {_drop_data::4}
+		if a random integer between 0 and 99 is less than (({_drop_chance} parsed as number) * 100):
+			set {_amount_left} to get_integer_in_range({_drop_amounts})
+			
+			set {_max_stack} to maximum stack size of ({rpg::itemdef::%{_drop_item}%} parsed as itemtype)
+			if {_max_stack} is less than or equal to 0:
+				set {_amount_left} to 0
+			# split up the stacks, if the drop specifies more items that can be held in a stack.
+			while {_amount_left} is greater than 0:
+				set {_prefix_index} to random integer between 1 and size of {_drop_prefixes::*}
+				set {_prefix} to {_drop_prefixes::%{_prefix_index}%}
+				if {_prefix} is "":
+					delete {_prefix}
+				if {_amount_left} is greater than {_max_stack}:
+					drop create_rpgitem_stack({_drop_item}, {_prefix}, {_max_stack}) at {_loc}
+					set {_amount_left} to {_amount_left} - {_max_stack}
+				else:
+					drop create_rpgitem_stack({_drop_item}, {_prefix}, {_amount_left}) at {_loc}
+					set {_amount_left} to 0
+

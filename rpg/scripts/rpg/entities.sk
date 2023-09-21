@@ -1,0 +1,31 @@
+
+function getEntityCustomNBT(entity: entity) :: nbt compound:
+	set {_helmet} to {_entity}'s helmet
+	set {_nbt} to nbt compound of {_helmet}
+	return {_nbt}
+
+function spawnentity(mob_id: text, loc: location):
+	set {_level} to {rpg::entitydef::%{_mob_id}%::level}
+	set {_display_name} to {rpg::entitydef::%{_mob_id}%::display_name}
+	spawn ({rpg::entitydef::%{_mob_id}%} parsed as entitytype) at {_loc} with nbt from "{Tags:['hostile','%{_mob_id}%'],IsVillager:0b,IsBaby:0b,PersistenceRequired:1b,HandItems:[{},{}],ArmorItems:[{},{},{},{}]}"
+	set name of last spawned entity to "%formatted_level({_level})% &c&l%{_display_name}%"
+	
+	# stone button on head prevents burning in the day
+	if helmet of last spawned entity is air:
+		set helmet of last spawned entity to stone button with nbt from "{tag:{test:1b}}"
+
+# custom damage to and from entity.
+# custom health
+
+every 10 seconds:
+	loop all zombies:
+		set tag "DrownedConversionTime" of nbt compound of loop-entity to -1
+
+on death:
+	if victim is not a player:
+		remove all xp from drops
+		set {_victim::Tags::*} to string list tag "Tags" of nbt compound of victim
+		set {_mob_id} to {_victim::Tags::2}
+		if {_mob_id} is set:
+			drop_loot_table({rpg::entitydef::%{_mob_id}%::loot_table}, location of victim)
+		

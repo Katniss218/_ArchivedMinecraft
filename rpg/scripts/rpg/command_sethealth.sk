@@ -1,0 +1,10 @@
+
+command /sethealth <text> [<text>]:
+	trigger:
+		if arg-2 is set:
+			set {_plr} to arg-1 parsed as player
+			set {_health} to arg-2 parsed as number
+			set health of {_plr} to ({_health} / 2) # Skript uses 0..10, Minecraft uses 0..20. We use minecraft's.
+		else:
+			set {_health} to arg-1 parsed as number
+			set health of player to ({_health} / 2) # Skript uses 0..10, Minecraft uses 0..20. We use minecraft's.

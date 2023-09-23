@@ -1,0 +1,117 @@
+# entity types:
+# 'hostile_normal'
+# 'hostile_miniboss'
+# 'hostile_boss'
+
+rpgentities:
+  decayed_corpse:
+    base: 'zombie'
+    level: 2
+    entity_type: 'hostile_normal'
+    display:
+      name: 'Decayed Corpse'    
+      mainhand: 'stick'
+      #mainhand_nbt: '{...}'
+      #offhand: '...'
+      #offhand_nbt: '{...}'
+      head: 'player head'
+      head_nbt: '{SkullOwner:{Id:[I;-1862865665,1524581460,-1105029049,2096356778],Properties:{textures:[{Value:"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDUzNDA5MGE2YWY1ZGY4NDliNDdkZDUxZDAzN2E0Y2Y2ODU2YWFmNzE0ZWZmZjA1Y2VkYjQ3OTcyM2UxMjBjNyJ9fX0="}]}}}'
+      chest: 'leather chestplate'
+      #chest_nbt: '{...}'
+      #legs: '...'
+      #legs_nbt: '{...}'
+      #feet: '...'
+      #feet_nbt: '{...}'
+    hit_effect: 'blood'
+    parameters:
+      primary:
+        max_health: 16.0
+        attack_damage: 3.0
+        #crit_chance: 0.0
+        #armor: 0.0
+        follow_range: 16.0
+        movement_speed: 0.2
+        knockback_resistance: 0.5
+    loot_table: 'decayed_corpse'
+    
+  decrepit_corpse:
+    base: 'zombie'
+    level: 5
+    entity_type: 'hostile_normal'
+    display:
+      name: 'Decrepit Corpse'
+      head: 'player head'
+      head_nbt: '{SkullOwner:{Id:[I;-1862865665,1524581460,-1105029049,2096356778],Properties:{textures:[{Value:"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDUzNDA5MGE2YWY1ZGY4NDliNDdkZDUxZDAzN2E0Y2Y2ODU2YWFmNzE0ZWZmZjA1Y2VkYjQ3OTcyM2UxMjBjNyJ9fX0="}]}}}'
+      chest: 'leather chestplate'
+    hit_effect: 'blood'
+    parameters:
+      primary:
+        max_health: 25.0
+        attack_damage: 5.0
+        follow_range: 16.0
+        movement_speed: 0.25
+        knockback_resistance: 0.5
+    loot_table: 'decrepit_corpse'
+    
+  decrepit_skeleton:
+    base: 'skeleton'
+    level: 5
+    entity_type: 'hostile_normal'
+    display:
+      name: 'Decrepit Skeleton'
+      head: 'player head'
+      head_nbt: '{SkullOwner:{Id:[I;-1862865665,1524581460,-1105029049,2096356778],Properties:{textures:[{Value:"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDUzNDA5MGE2YWY1ZGY4NDliNDdkZDUxZDAzN2E0Y2Y2ODU2YWFmNzE0ZWZmZjA1Y2VkYjQ3OTcyM2UxMjBjNyJ9fX0="}]}}}'
+      chest: 'leather chestplate'
+    hit_effect: 'bone'
+    parameters:
+      primary:
+        max_health: 25.0
+        attack_damage: 5.0
+        follow_range: 16.0
+        movement_speed: 0.25
+        knockback_resistance: 0.5
+    loot_table: 'decrepit_skeleton'
+    
+  undead_general:
+    base: 'zombie'
+    level: 12
+    entity_type: 'hostile_normal'
+    display:
+      name: 'Undead General'    
+      mainhand: 'stone axe'
+      head: 'player head'
+      head_nbt: '{SkullOwner:{Id:[I;-1862865665,1524581460,-1105029049,2096356778],Properties:{textures:[{Value:"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjc1Y2Y1MTIxMjg5Y2I4Y2QxZjA5NmFhMTdmZDkxZGFlNzQ2OGMzM2VjYzU2NDlmNjA0ZDk4MWIxZDZkMjhlNSJ9fX0="}]}}}'
+      chest: 'iron chestplate'
+      legs: 'leather leggings'
+      feet: 'leather boots'
+    hit_effect: 'blood'
+    parameters:
+      primary:
+        max_health: 90.0
+        attack_damage: 9.0
+        follow_range: 16.0
+        movement_speed: 0.25
+        knockback_resistance: 0.5
+    loot_table: 'undead_general'
+    
+  decayed_archer:
+    base: 'skeleton'
+    level: 9
+    entity_type: 'hostile_normal'
+    display:
+      name: 'Decayed Archer'    
+      mainhand: 'bow'
+      head: 'dirt'
+      chest: 'leather chestplate'
+      chest_nbt: '{display:{color:0}}'
+      legs: 'leather leggings'
+      feet: 'leather boots'
+    hit_effect: 'blood'
+    parameters:
+      primary:
+        max_health: 30.0
+        attack_damage: 7.0
+        follow_range: 24.0
+        movement_speed: 0.2
+        knockback_resistance: 0.5
+    loot_table: 'decayed_archer'

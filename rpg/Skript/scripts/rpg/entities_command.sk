@@ -1,0 +1,56 @@
+
+options:
+	nopermission_message: "&cI'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is an error."
+
+on tab complete for "/rpgentity":
+	set tab completions for position 1 to "spawn", "kill" and "killall"
+	if tab arg-1 = "spawn":
+		loop {rpg::entitydef::*}:
+			add loop-index to tab completions for position 2
+	if tab arg-1 = "kill":
+		loop {rpg::entitydef::*}:
+			add loop-index to tab completions for position 2
+
+command /rpgentity [<text>] [<text>] [<text>]:
+	trigger:
+		if arg-1 is "spawn":
+			if arg-2 is set:
+				if player has permission "rpg.rpgentity.spawn":
+					if arg-3 is set:
+						set {_count} to arg-3 parsed as integer
+					else:
+						set {_count} to 1
+					loop {_count} times:
+						spawn_rpgentity(arg-2, player's location)
+					send "&aSpawned %{_count}% '%arg-2%'(s)."
+				else:
+					send {@nopermission_message} to player
+			else:
+				send "&cSpecify the rpg entity id."
+		if arg-1 is "kill":
+			if player has permission "rpg.rpgentity.kill":
+				if arg-2 is set:
+					set {_count} to 0
+					loop all entities:
+						set {_tags::*} to string list tag "Tags" of nbt compound of loop-entity
+						set {_tags::*} to {_tags::1} split at "|"
+						set {_mob_id} to {_tags::2}
+						if {_mob_id} is equal to arg-2:
+							add 1 to {_count}
+							teleport loop-entity to location at (0, 0, 0)
+					send "&aKilled %{_count}% entities."
+			else:
+				send {@nopermission_message} to player
+		if arg-1 is "killall":
+			if player has permission "rpg.rpgentity.killall":
+				set {_count} to 0
+				loop all entities:
+					set {_tags::*} to string list tag "Tags" of nbt compound of loop-entity
+					set {_tags::*} to {_tags::1} split at "|"
+					set {_mob_id} to {_tags::2}
+					if {_mob_id} is set:
+						add 1 to {_count}
+						teleport loop-entity to location at (0, 0, 0)
+				send "&aKilled %{_count}% entities."
+			else:
+				send {@nopermission_message} to player

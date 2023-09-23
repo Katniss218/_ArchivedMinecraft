@@ -1,8 +1,0 @@
-
-on consume:
-	set {_nbt} to nbt compound of event-item
-	set {_item_id} to tag "item_id" of {_nbt}
-	if {rpg::itemdef::%{_item_id}%::food} is set:
-		cancel event
-		set the player's food level to the player's food level + ({rpg::itemdef::%{_item_id}%::food} / 2) # Skript uses 0..10, Minecraft uses 0..20. We use minecraft's.
-		remove 1 of event-item from player's inventory

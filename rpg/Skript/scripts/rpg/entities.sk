@@ -1,0 +1,90 @@
+
+function get_rpgentity_data(entity: entity) :: strings:
+	set {_tags::*} to string list tag "Tags" of nbt compound of {_entity}
+	return {_tags::1} split at "|"
+
+function spawn_rpgentity(mob_id: text, loc: location):
+	set {_level} to {rpg::entitydef::%{_mob_id}%::level}
+	set {_display_name} to {rpg::entitydef::%{_mob_id}%::display_name}
+	spawn ({rpg::entitydef::%{_mob_id}%} parsed as entitytype) at {_loc} with nbt from "{IsVillager:0b,IsBaby:0b,PersistenceRequired:1b,HandItems:[{},{}],HandDropChances:[0.0F,0.0F],ArmorItems:[{},{},{},{}],ArmorDropChances:[0.0F,0.0F,0.0F,0.0F]}"
+	
+	# In Spigot, order of NBT tags is not guaranteed (something something hashmap).
+	# Due to this, we store the data in one tag, split on "|"
+	set string list tag "Tags" of nbt compound of last spawned entity to "rpgentity|%{_mob_id}%|%{_loc}'s x-coordinate%,%{_loc}'s y-coordinate%,%{_loc}'s z-coordinate%,%{_loc}'s world%"
+	set tag "CustomNameVisible" of nbt compound of last spawned entity to true
+	
+	if {rpg::entitydef::%{_mob_id}%::params::max_health_primary} is set:
+		set maximum health of last spawned entity to {rpg::entitydef::%{_mob_id}%::params::max_health_primary} / 2
+		set health of last spawned entity to {rpg::entitydef::%{_mob_id}%::params::max_health_primary} / 2
+	else:
+		set maximum health of last spawned entity to {@rpg_default_entity_max_health}
+		set health of last spawned entity to {@rpg_default_entity_max_health}
+		
+	if {rpg::entitydef::%{_mob_id}%::params::movement_speed_primary} is set:
+		set movement speed attribute of last spawned entity to {rpg::entitydef::%{_mob_id}%::params::movement_speed_primary}
+	else:
+		set movement speed attribute of last spawned entity to {@rpg_default_entity_movement_speed}
+	
+	if {rpg::entitydef::%{_mob_id}%::params::follow_range_primary} is set:
+		set generic follow range attribute of last spawned entity to {rpg::entitydef::%{_mob_id}%::params::follow_range_primary}
+	else:
+		set generic follow range attribute of last spawned entity to {@rpg_default_entity_follow_range}
+		
+	if {rpg::entitydef::%{_mob_id}%::params::knockback_resistance_primary} is set:
+		set knockback resistance attribute of last spawned entity to {rpg::entitydef::%{_mob_id}%::params::knockback_resistance_primary}
+	else:
+		set knockback resistance attribute of last spawned entity to {@rpg_default_entity_follow_range}
+	
+	set name of last spawned entity to "%formatted_level({_level})% &c&l%{_display_name}%"
+	
+	if {rpg::entitydef::%{_mob_id}%::mainhand} is set:
+		if {rpg::entitydef::%{_mob_id}%::mainhand::nbt} is set:
+			set weapon of last spawned entity to ({rpg::entitydef::%{_mob_id}%::mainhand} parsed as item type) with nbt from {rpg::entitydef::%{_mob_id}%::mainhand::nbt}
+		else:
+			set weapon of last spawned entity to ({rpg::entitydef::%{_mob_id}%::mainhand} parsed as item type)
+	if {rpg::entitydef::%{_mob_id}%::offhand} is set:
+		if {rpg::entitydef::%{_mob_id}%::offhand::nbt} is set:
+			set offhand tool of last spawned entity to ({rpg::entitydef::%{_mob_id}%::offhand} parsed as item type) with nbt from {rpg::entitydef::%{_mob_id}%::offhand::nbt}
+		else:
+			set offhand tool of last spawned entity to ({rpg::entitydef::%{_mob_id}%::offhand} parsed as item type)
+	if {rpg::entitydef::%{_mob_id}%::head} is set:
+		if {rpg::entitydef::%{_mob_id}%::head::nbt} is set:
+			set helmet of last spawned entity to ({rpg::entitydef::%{_mob_id}%::head} parsed as item type) with nbt from {rpg::entitydef::%{_mob_id}%::head::nbt}
+		else:
+			set helmet of last spawned entity to ({rpg::entitydef::%{_mob_id}%::head} parsed as item type)
+	if {rpg::entitydef::%{_mob_id}%::chest} is set:
+		if {rpg::entitydef::%{_mob_id}%::chest::nbt} is set:
+			set chestplate of last spawned entity to ({rpg::entitydef::%{_mob_id}%::chest} parsed as item type) with nbt from {rpg::entitydef::%{_mob_id}%::chest::nbt}
+		else:
+			set chestplate of last spawned entity to ({rpg::entitydef::%{_mob_id}%::chest} parsed as item type)
+	if {rpg::entitydef::%{_mob_id}%::legs} is set:
+		if {rpg::entitydef::%{_mob_id}%::legs::nbt} is set:
+			set leggings of last spawned entity to ({rpg::entitydef::%{_mob_id}%::legs} parsed as item type) with nbt from {rpg::entitydef::%{_mob_id}%::legs::nbt}
+		else:
+			set leggings of last spawned entity to ({rpg::entitydef::%{_mob_id}%::legs} parsed as item type)
+	if {rpg::entitydef::%{_mob_id}%::feet} is set:
+		if {rpg::entitydef::%{_mob_id}%::feet::nbt} is set:
+			set boots of last spawned entity to ({rpg::entitydef::%{_mob_id}%::feet} parsed as item type) with nbt from {rpg::entitydef::%{_mob_id}%::feet::nbt}
+		else:
+			set boots of last spawned entity to ({rpg::entitydef::%{_mob_id}%::feet} parsed as item type)
+	
+	# stone button on head prevents burning in the day
+	if helmet of last spawned entity is air:
+		set helmet of last spawned entity to stone button
+
+# custom damage to and from entity.
+# custom health
+
+every 10 seconds:
+	loop all zombies:
+		if block at loop-zombie is water:
+			set tag "InWaterTime" of nbt compound of loop-entity to -1
+
+on death:
+	if victim is not a player:
+		remove all xp from drops
+		set {_victim::Tags::*} to get_rpgentity_data(victim)
+		set {_mob_id} to {_victim::Tags::2}
+		if {_mob_id} is set:
+			drop_loot_table({rpg::entitydef::%{_mob_id}%::loot_table}, location of victim)
+		

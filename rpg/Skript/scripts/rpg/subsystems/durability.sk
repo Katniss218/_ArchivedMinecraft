@@ -1,0 +1,29 @@
+
+on item damage:
+	cancel event
+	if event-entity is a player:
+		# items without durability tag will not take damage. they are unbreakable.
+		# not setting the durability field in the config makes it unbreakable.
+		set {_dura} to tag "rpg.durability" of nbt compound of event-item
+		if {_dura} is set:
+			remove 1 from {_dura}
+			if {_dura} is less than or equal to 0:
+				remove event-item from player
+				play sound "minecraft:item.shield.break" with volume 0.7 with pitch 1 to player
+			else:
+				set tag "rpg.durability" of nbt compound of event-item to {_dura}
+				set {_item_id} to tag "rpg.item_id" of nbt compound of event-item
+				set {_perc} to {_dura} / {rpg::itemdef::%{_item_id}%::durability}
+				if event-item is player's tool:
+					set durability of player's tool to (max durability of player's tool * {_perc})
+				else if event-item is player's offhand tool:
+					set durability of player's offhand tool to (max durability of player's offhand tool * {_perc})
+				else if event-item is player's helmet:
+					set durability of player's helmet to (max durability of player's helmet * {_perc})
+				else if event-item is player's chestplate:
+					set durability of player's chestplate to (max durability of player's chestplate * {_perc})
+				else if event-item is player's leggings:
+					set durability of player's leggings to (max durability of player's leggings * {_perc})
+				else if event-item is player's boots:
+					set durability of player's boots to (max durability of player's boots * {_perc})
+				

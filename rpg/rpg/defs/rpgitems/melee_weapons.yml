@@ -1,0 +1,57 @@
+rpgitems:
+  rotten_branch:
+    base: 'wooden sword'
+    level: 1
+    item_type: 'weapon'
+    rarity: 0
+    display:
+      name: 'Rotten Branch'
+      description:
+      - '- A half-decayed tree branch. Looks like it might'
+      - '  snap if you whack it hard enough.'
+    parameters:
+      primary:
+        attack_damage: 2.0
+        attack_speed: -2.0
+        crit_chance: 0.05
+      #additional_flat:
+      #  movement_speed: -1.0
+      #additional_percent:
+      #  movement_speed: 0.05
+    durability: 45
+    value: 10
+  rusty_dagger:
+    base: 'stone sword'
+    level: 3
+    item_type: 'weapon'
+    rarity: 1
+    display:
+      name: 'Rusty Dagger'
+      description:
+      - '- An old dagger with a rusted blade. Despite of its'
+      - '  appearance, it can still inflict deadly wounds.'
+    parameters:
+      primary:
+        attack_damage: 2.0
+        attack_speed: -1.2
+        crit_chance: 0.1
+    durability: 90
+    value: 10
+  serrated_bone_blade:
+    base: 'stone sword'
+    level: 9
+    item_type: 'weapon'
+    rarity: 2
+    display:
+      name: 'Serrated Bone Blade'
+      description:
+      - '- Crafted from the bones of fallen creatures. The'
+      - '  serrated edges make it particularly effective at'
+      - '  tearing through flesh.'
+    parameters:
+      primary:
+        attack_damage: 6.0
+        attack_speed: -2.0
+        crit_chance: 0.05
+    durability: 180
+    value: 10

@@ -1,0 +1,16 @@
+
+on script load:
+
+	# Do not flat remove any variables - people might add weapons via commands, etc. in the future.
+
+	loop all of the currently loaded yaml files: # from directory?
+		unload yaml loop-value
+	load all yaml from directory "plugins/rpg/defs/"
+	loop all of the currently loaded yaml files: # from directory?
+		# loop-value-1 is the file
+		loop yaml nodes with keys "rpgloot_tables" from loop-value-1:
+			set {_id} to loop-value-2
+			set {rpg::loot_tabledef::%{_id}%} to "" # yaml value <path> from <file>
+			set {rpg::loot_tabledef::%{_id}%::money} to yaml value "rpgloot_tables.%{_id}%.money" from loop-value-1
+			set {rpg::loot_tabledef::%{_id}%::xp} to yaml value "rpgloot_tables.%{_id}%.xp" from loop-value-1
+			set {rpg::loot_tabledef::%{_id}%::items::*} to yaml list "rpgloot_tables.%{_id}%.items" from loop-value-1

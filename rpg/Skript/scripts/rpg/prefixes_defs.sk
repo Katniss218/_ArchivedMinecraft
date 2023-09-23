@@ -1,0 +1,24 @@
+
+variables:
+    {rpg::prefixdef::broken} = "" # empty makes this prefix appear in the pool of prefixes
+    {rpg::prefixdef::broken::rarity} = -1
+    {rpg::prefixdef::broken::item_types::1} = "weapon"
+    {rpg::prefixdef::broken::item_types::2} = "armor"
+    {rpg::prefixdef::broken::display_name} = "Broken"
+    {rpg::prefixdef::broken::attack_damage} = -0.2
+    {rpg::prefixdef::broken::armor} = -0.2
+
+    {rpg::prefixdef::bent} = "" # empty makes this prefix appear in the pool of prefixes
+    {rpg::prefixdef::bent::rarity} = -1
+    {rpg::prefixdef::bent::item_types::1} = "weapon"
+    {rpg::prefixdef::bent::display_name} = "Bent"
+    {rpg::prefixdef::bent::attack_damage} = -0.1
+    {rpg::prefixdef::bent::armor} = -0.1
+
+function get_random_prefix(item_id: text) :: text:
+	loop {rpg::prefixdef::*}:
+		loop {rpg::prefixdef::%loop-index%::item_types::*}:
+			if {rpg::itemdef::%{_item_id}%::item_type} is equal to loop-value-2:
+				add loop-index-1 to {_compatible_prefixes::*}
+	set {_index} to a random integer between 1 and size of {_compatible_prefixes::*}
+	return {_compatible_prefixes::%{_index}%}

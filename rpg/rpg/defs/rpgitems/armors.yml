@@ -1,0 +1,33 @@
+rpgitems:
+  frayed_cloth_tunic:
+    base: 'leather chestplate'
+    level: 1
+    item_type: 'armor'
+    rarity: 0
+    display:
+      name: 'Frayed Cloth Tunic'
+      description:
+    parameters:
+      primary:
+        armor: 1.0
+    durability: 45
+    value: 5
+  rusty_plate_armor:
+    base: 'iron chestplate'
+    level: 12
+    item_type: 'armor'
+    rarity: 3
+    display:
+      name: 'Rusty Plate Armor'
+      description:
+      - '- A set of heavy plate armor, once glorious but'
+      - '  now marred by rust.'
+      - '- Despite its worn appearance, it still provides'
+      - '  good protection.'
+    parameters:
+      primary:
+        armor: 9.0
+      additional_flat:
+        attack_damage: 2.0
+    durability: 320
+    value: 100

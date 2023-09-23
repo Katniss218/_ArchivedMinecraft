@@ -1,0 +1,12 @@
+rpgitems:
+  bone_splinters:
+    base: 'bone'
+    level: 3
+    item_type: 'loot'
+    rarity: 1
+    display:
+      name: 'Bone Splinters'
+      description:
+      - '- Jagged fragments of bone with bits of flesh'
+      - '  still attached.'
+    value: 1

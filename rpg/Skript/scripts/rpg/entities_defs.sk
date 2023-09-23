@@ -1,0 +1,42 @@
+
+options:
+	rpg_default_entity_max_health: 9.5
+	rpg_default_entity_movement_speed: 0.2
+	rpg_default_entity_follow_range: 16
+
+on script load:
+
+	# Do not flat remove any variables - people might add weapons via commands, etc. in the future.
+
+	loop all of the currently loaded yaml files: # from directory?
+		unload yaml loop-value
+	load all yaml from directory "plugins/rpg/defs/"
+	loop all of the currently loaded yaml files: # from directory?
+		# loop-value-1 is the file
+		loop yaml nodes with keys "rpgentities" from loop-value:
+			set {_id} to loop-value-2
+			set {rpg::entitydef::%{_id}%} to yaml value "rpgentities.%{_id}%.base" from loop-value-1 # yaml value <path> from <file>
+			set {rpg::entitydef::%{_id}%::level} to yaml value "rpgentities.%{_id}%.level" from loop-value-1
+			set {rpg::entitydef::%{_id}%::entity_type} to yaml value "rpgentities.%{_id}%.entity_type" from loop-value-1
+			set {rpg::entitydef::%{_id}%::display_name} to yaml value "rpgentities.%{_id}%.display.name" from loop-value-1
+			set {rpg::entitydef::%{_id}%::mainhand} to yaml value "rpgentities.%{_id}%.display.mainhand" from loop-value-1
+			set {rpg::entitydef::%{_id}%::mainhand::nbt} to yaml value "rpgentities.%{_id}%.display.mainhand_nbt" from loop-value-1
+			set {rpg::entitydef::%{_id}%::offhand} to yaml value "rpgentities.%{_id}%.display.offhand" from loop-value-1
+			set {rpg::entitydef::%{_id}%::offhand::nbt} to yaml value "rpgentities.%{_id}%.display.offhand_nbt" from loop-value-1
+			set {rpg::entitydef::%{_id}%::head} to yaml value "rpgentities.%{_id}%.display.head" from loop-value-1
+			set {rpg::entitydef::%{_id}%::head::nbt} to yaml value "rpgentities.%{_id}%.display.head_nbt" from loop-value-1
+			set {rpg::entitydef::%{_id}%::chest} to yaml value "rpgentities.%{_id}%.display.chest" from loop-value-1
+			set {rpg::entitydef::%{_id}%::chest::nbt} to yaml value "rpgentities.%{_id}%.display.chest_nbt" from loop-value-1
+			set {rpg::entitydef::%{_id}%::legs} to yaml value "rpgentities.%{_id}%.display.legs" from loop-value-1
+			set {rpg::entitydef::%{_id}%::legs::nbt} to yaml value "rpgentities.%{_id}%.display.legs_nbt" from loop-value-1
+			set {rpg::entitydef::%{_id}%::feet} to yaml value "rpgentities.%{_id}%.display.feet" from loop-value-1
+			set {rpg::entitydef::%{_id}%::feet::nbt} to yaml value "rpgentities.%{_id}%.display.feet_nbt" from loop-value-1
+			set {rpg::entitydef::%{_id}%::effect_hit} to yaml value "rpgentities.%{_id}%.hit_effect" from loop-value-1
+			set {rpg::entitydef::%{_id}%::params::max_health_primary} to yaml value "rpgentities.%{_id}%.parameters.primary.max_health" from loop-value-1
+			set {rpg::entitydef::%{_id}%::params::attack_damage_primary} to yaml value "rpgentities.%{_id}%.parameters.primary.attack_damage" from loop-value-1
+			set {rpg::entitydef::%{_id}%::params::crit_chance_primary} to yaml value "rpgentities.%{_id}%.parameters.primary.crit_chance" from loop-value-1
+			set {rpg::entitydef::%{_id}%::params::armor_primary} to yaml value "rpgentities.%{_id}%.parameters.primary.armor" from loop-value-1
+			set {rpg::entitydef::%{_id}%::params::follow_range_primary} to yaml value "rpgentities.%{_id}%.parameters.primary.follow_range" from loop-value-1
+			set {rpg::entitydef::%{_id}%::params::movement_speed_primary} to yaml value "rpgentities.%{_id}%.parameters.primary.movement_speed" from loop-value-1
+			set {rpg::entitydef::%{_id}%::params::knockback_resistance_primary} to yaml value "rpgentities.%{_id}%.parameters.primary.knockback_resistance" from loop-value-1
+			set {rpg::entitydef::%{_id}%::loot_table} to yaml value "rpgentities.%{_id}%.loot_table" from loop-value-1

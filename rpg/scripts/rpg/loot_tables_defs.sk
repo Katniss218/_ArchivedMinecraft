@@ -1,4 +1,0 @@
-
-variables:
-    {rpg::loot_tabledef::lv5_zombie::xp} = "10-20"
-    {rpg::loot_tabledef::lv5_zombie::items::1} = "1|broken,|wooden_sword|1.0"

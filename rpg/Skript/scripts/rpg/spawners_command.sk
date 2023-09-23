@@ -1,0 +1,81 @@
+
+# Adding things to `variables` clears them when the script is reloaded.
+
+on tab complete for "/rpgspawner":
+	set tab completions for position 1 to "create", "modify", "remove", "removeall", "tp", and "list"
+	if tab arg-1 = "create" or "modify":
+		loop {rpg::entitydef::*}:
+			add loop-index to tab completions for position 2
+	if tab arg-1 = "list":
+		set tab completions for position 2 to "" and "invalid"
+
+command /rpgspawner [<text>] [<text>] [<text>]:
+	executable by: players
+	trigger:
+		if player has permission "rpg.rpgspawner":
+			if arg-1 is "create":
+				if arg-2 is set:
+					if arg-3 is set:
+						set {_mob_count} to arg-3 parsed as number
+					else:
+						set {_mob_count} to 1
+					set {_round_loc} to location((rounded x-coordinate of player) + 0.5, (rounded y-coordinate of player) + 0.5, (rounded z-coordinate of player) + 0.5, player's world)
+					if {rpgdb::spawners::*} contains {_round_loc}:
+						send "&c%{_round_loc}% is already a spawner." to player
+						stop
+					add {_round_loc} to {rpgdb::spawners::*}
+					set {_new_index} to size of {rpgdb::spawners::*}
+					set {rpgdb::spawners::%{_new_index}%::mob_id} to arg-2
+					set {rpgdb::spawners::%{_new_index}%::mob_count} to {_mob_count}
+					send "&aAdded a spawner at %{_round_loc}%." to player
+				else:
+					send "&cspecify mob ID" to player
+				stop
+			if arg-1 is "remove":
+				if arg-2 is set:
+					delete {rpgdb::spawners::%arg-2%}
+					delete {rpgdb::spawners::%arg-2%::mob_id}
+					delete {rpgdb::spawners::%arg-2%::mob_count}
+				set {_round_loc} to location((rounded x-coordinate of player) + 0.5, rounded (y-coordinate of player) + 0.5, (rounded z-coordinate of player) + 0.5, player's world)
+				if {rpgdb::spawners::*} contains {_round_loc}:
+					remove {_round_loc} from {rpgdb::spawners::*}
+					send "&aRemoved %{_round_loc}% from spawners." to player
+				stop
+			if arg-1 is "modify":
+				if arg-2 is set:
+					if arg-3 is set:
+						set {_mob_count} to arg-3 parsed as number
+					else:
+						set {_mob_count} to 1
+					set {_round_loc} to location((rounded x-coordinate of player) + 0.5, (rounded y-coordinate of player) + 0.5, (rounded z-coordinate of player) + 0.5, player's world)
+					loop {rpgdb::spawners::*}:
+						if loop-value is equal to {_round_loc}:
+							set {rpgdb::spawners::%loop-index%} to {_round_loc}
+							set {rpgdb::spawners::%loop-index%::mob_id} to arg-2
+							set {rpgdb::spawners::%loop-index%::mob_count} to {_mob_count}
+							send "&aModified a spawner at %{_round_loc}%." to player
+							stop
+					send "&cSpawner not found at %{_round_loc}%." to player
+				else:
+					send "&cspecify mob ID" to player
+				stop
+			if arg-1 is "removeall":
+				clear {rpgdb::spawners::*}
+				send "&aRemoved all spawners." to player
+				stop
+			if arg-1 is "list":
+				if {rpgdb::spawners::*} is empty:
+					send "&aNo spawners." to player
+					stop
+				if arg-2 is not set:
+					loop {rpgdb::spawners::*}:
+						send "&a%loop-index%: %loop-value%, %{rpgdb::spawners::%loop-index%::mob_count}%x %{rpgdb::spawners::%loop-index%::mob_id}%" to player
+					stop
+				if arg-2 is "invalid":
+					loop {rpgdb::spawners::*}:
+						if {rpg::entitydef::%{rpgdb::spawners::%loop-index%::mob_id}%} is not set:
+							send "&a- %loop-index%&8: &6%loop-value's x-coordinate%, %loop-value's y-coordinate%, %loop-value's z-coordinate% in %loop-value's world%&8 - &a%{rpgdb::spawners::%loop-index%::mob_count}%x %{rpgdb::spawners::%loop-index%::mob_id}%" to player
+				stop
+			if arg-1 is "tp":
+				if arg-2 is set:
+					teleport player to {rpgdb::spawners::%arg-2%}

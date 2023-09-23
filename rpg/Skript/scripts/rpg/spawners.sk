@@ -1,0 +1,67 @@
+
+options:
+	spawn_frequency: 7 seconds
+	min_radius: 24
+
+every {@spawn_frequency}:
+	loop {rpgdb::spawners::*}:
+		if chunk at {rpgdb::spawners::*} is not loaded:
+			continue
+		
+		# a player must be at most 80 blocks away for the spawner to spawn anything.
+		loop all players in radius 80 of loop-value-1:
+			set {_player_in_range} to true
+			exit 1 loop
+		if {_player_in_range} is not set:
+			continue
+		
+		set {_currSmallestDist} to 9999999
+		loop all entities in radius {@min_radius} of loop-value-1:
+			
+			# skip certain non-blocking entities, like arrows, paintings, etc.
+			if loop-entity is a dropped item:
+				continue
+			if loop-entity is an arrow:
+				continue
+			if loop-entity is a painting:
+				continue
+			if loop-entity is an item frame:
+				continue
+			if loop-entity is an armor stand:
+				continue
+			if loop-entity is a oak boat:
+				continue
+			if loop-entity is a spruce boat:
+				continue
+			if loop-entity is a birch boat:
+				continue
+			if loop-entity is a jungle boat:
+				continue
+			if loop-entity is a acacia boat:
+				continue
+			if loop-entity is a dark oak boat:
+				continue
+				
+			set {_currDist} to distance between loop-entity and loop-value-1
+			if {_currDist} is less than {@min_radius}:
+				set {_currSmallestDist} to {_currDist}
+				exit 1 loop
+		if {_currSmallestDist} is greater than {@min_radius}:
+			loop {rpgdb::spawners::%loop-index%::mob_count} times:
+				spawn_rpgentity({rpgdb::spawners::%loop-index%::mob_id}, loop-value-1)
+	
+	# add a spawner that won't spawn until the entity it spawned is dead. (boss)
+
+# path stuff is not working.
+#every 9 seconds:
+#	loop all entities:
+#		set {_victim::Tags::*} to get_rpgentity_data(loop-entity)
+#		set {_mob_id} to {_victim::Tags::2}
+#		if {_mob_id} is set:
+#			set {_split::*} to {_victim::Tags::3} split at ","
+#			set {_loc} to location at ({_split::1} parsed as number), ({_split::2} parsed as number), ({_split::3} parsed as number) of loop-entity's world
+#			delete path target of loop-entity
+#			set path target of loop-entity to {_loc}
+#			broadcast "-----------"
+#			broadcast "%loop-entity's display name%&6 spawner: %{_victim::Tags::3}%"
+#			broadcast "%loop-entity's display name%&6 is pathfinding to: %path target of loop-entity%"

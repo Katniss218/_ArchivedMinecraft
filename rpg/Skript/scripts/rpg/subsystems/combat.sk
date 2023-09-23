@@ -1,0 +1,143 @@
+	
+options:
+	damage_multiplier_min: 0.75
+	damage_multiplier_max: 1.25
+	damage_multiplier_crit: 2.0
+
+function GetRPGEntityProperty(entity: entity, property: text) :: number:
+	set {_tags::*} to get_rpgentity_data({_entity})
+	set {_entity_id} to {_tags::2}
+	return {rpg::entitydef::%{_entity_id}%::params::%{_property}%_primary} # entities don't have secondary
+
+function GetRPGItemProperty(item: item, property: text) :: number:
+	set {_item_id} to tag "rpg.item_id" of nbt compound of {_item}
+	return {rpg::itemdef::%{_item_id}%::params::%{_property}%_primary} + {rpg::itemdef::%{_item_id}%::params::%{_property}%_additional_flat}
+
+# returns the total property
+function GetProperty(entity: entity, property: text) :: number:
+	if {_entity} is a player:
+		set {_sum} to 0
+		set {_weapon_id} to tag "rpg.item_id" of nbt compound of {_entity}'s weapon
+		if {rpg::itemdef::%{_weapon_id}%::item_type} is "weapon":
+			add {rpg::itemdef::%{_weapon_id}%::params::%{_property}%_primary} to {_sum}
+			add {rpg::itemdef::%{_weapon_id}%::params::%{_property}%_additional_flat} to {_sum}
+			add {rpg::itemdef::%{_weapon_id}%::params::%{_property}%_additional_percent} to {_sum2}
+		set {_offhand_id} to tag "rpg.item_id" of nbt compound of {_entity}'s offhand tool
+		if {rpg::itemdef::%{_offhand_id}%::item_type} is "offhand":
+			add {rpg::itemdef::%{_offhand_id}%::params::%{_property}%_primary} to {_sum}
+			add {rpg::itemdef::%{_offhand_id}%::params::%{_property}%_additional_flat} to {_sum}
+			add {rpg::itemdef::%{_offhand_id}%::params::%{_property}%_additional_percent} to {_sum2}
+		set {_head_id} to tag "rpg.item_id" of nbt compound of {_entity}'s helmet
+		if {rpg::itemdef::%{_head_id}%::item_type} is "armor":
+			add {rpg::itemdef::%{_head_id}%::params::%{_property}%_primary} to {_sum}
+			add {rpg::itemdef::%{_head_id}%::params::%{_property}%_additional_flat} to {_sum}
+			add {rpg::itemdef::%{_head_id}%::params::%{_property}%_additional_percent} to {_sum2}
+		set {_chest_id} to tag "rpg.item_id" of nbt compound of {_entity}'s chestplate
+		if {rpg::itemdef::%{_chest_id}%::item_type} is "armor":
+			add {rpg::itemdef::%{_chest_id}%::params::%{_property}%_primary} to {_sum}
+			add {rpg::itemdef::%{_chest_id}%::params::%{_property}%_additional_flat} to {_sum}
+			add {rpg::itemdef::%{_chest_id}%::params::%{_property}%_additional_percent} to {_sum2}
+		set {_legs_id} to tag "rpg.item_id" of nbt compound of {_entity}'s leggings
+		if {rpg::itemdef::%{_legs_id}%::item_type} is "armor":
+			add {rpg::itemdef::%{_legs_id}%::params::%{_property}%_primary} to {_sum}
+			add {rpg::itemdef::%{_legs_id}%::params::%{_property}%_additional_flat} to {_sum}
+			add {rpg::itemdef::%{_legs_id}%::params::%{_property}%_additional_percent} to {_sum2}
+		set {_feet_id} to tag "rpg.item_id" of nbt compound of {_entity}'s boots
+		if {rpg::itemdef::%{_feet_id}%::item_type} is "armor":
+			add {rpg::itemdef::%{_feet_id}%::params::%{_property}%_primary} to {_sum}
+			add {rpg::itemdef::%{_feet_id}%::params::%{_property}%_additional_flat} to {_sum}
+			add {rpg::itemdef::%{_feet_id}%::params::%{_property}%_additional_percent} to {_sum2}
+		
+		# bows can still be used in melee.
+		
+		set {_sum} to {_sum} * (1 + {_sum2})
+		return {_sum}
+	return GetRPGEntityProperty({_entity}, {_property})
+
+# calculates a melee hit, returns the damage caused.
+# PARAM: 'attacker' must be either a player or an rpgentity.
+# PARAM: 'attacker_id' is either not set (if player), or the ID of the attacking rpgentity.
+# PARAM: 'victim' must be either a player or an rpgentity.
+# PARAM: 'victim_id' is either not set (if player), or the ID of the attacked rpgentity.
+function rpgcombat_melee_hit(attacker: entity, attacker_id: string, victim: entity, victim_id: string) :: number: # also damage type?
+	# Attacker values
+	set {_damage} to GetProperty({_attacker}, "attack_damage")
+	set {_crit_chance} to GetProperty({_attacker}, "crit_chance")
+	if {_crit_chance} is not set:
+		set {_crit_chance} to 0
+	# Victim values
+	set {_defence} to GetProperty({_victim}, "armor")
+	set {_damage_reduction} to GetProperty({_victim}, "damage_reduction")
+   
+	# Damage calculation
+	set {_actual_damage} to a random number between ({_damage} * {@damage_multiplier_min}) and ({_damage} * {@damage_multiplier_max})
+	
+	if {_attacker_id} is not set:
+		set {_actual_damage} to {_actual_damage} * (attack cooldown of {_attacker})
+	
+	if {_defence} is set:
+		set {_actual_damage} to {_actual_damage} - ({_defence} * 0.5)
+	if {_actual_damage} is less than 1:
+		set {_actual_damage} to 1
+	if {_damage_reduction} is set:
+		set {_actual_damage} to {_actual_damage} * (1-{_damage_reduction})
+	if a random integer between 0 and 99 is less than ({_crit_chance} * 100):
+		set {_actual_damage} to {_actual_damage} * {@damage_multiplier_crit}
+	set {_damage_out} to {_actual_damage} / 2
+
+	# visual stuff
+	set {_healthRemoved} to 0 - {_actual_damage}
+	# health in bukkit's api is divided by 2 compared to minecraft itself.
+	set {_victim_health} to ({_victim}'s health * 2) - {_actual_damage}
+	set {_victim_max_health} to {_victim}'s maximum health * 2
+	
+	set {_perc} to {_victim_health} / {_victim_max_health}
+	set {_bar} to progress_bar(20, {_perc}, "&c", "&8")
+	set {_actionbar} to "%sign_to_color({_healthRemoved})%%number_to_text_with_sign({_healthRemoved})% HP &8&l--- &r%{_bar}% &8&l--- &8(&c%({_victim_health})% &8/ &c%{_victim_max_health}%&8)"
+	send action bar {_actionbar} to {_attacker}
+	
+	if {rpg::entitydef::%{_victim_id}%::effect_hit} is "blood":
+		make 30 of block using living fire coral fan at location 0.85 blocks above {_victim} with offset vector(0.3, 0.5, 0.3) with extra 1
+		make 30 of block using living fire coral block at location 0.85 blocks above {_victim} with offset vector(0.3, 0.5, 0.3) with extra 1
+	else if {rpg::entitydef::%{_victim_id}%::effect_hit} is "bone":
+		make 30 of block using bone block at location 0.85 blocks above {_victim} with offset vector(0.3, 0.5, 0.3) with extra 1
+	return {_damage_out}
+	# play particles
+	# show damage value as hologram
+
+# PARAM: 'attacker' must be either a player or an rpgentity.
+# PARAM: 'attacker_id' is either not set (if player), or the ID of the attacking rpgentity.
+# PARAM: 'location' is the location of the center of the explosion.
+# PARAM: 'power' is the strength of the explosion
+function rpgcombat_explode(attacker: entity, attacker_id: string, location: location, power: number):
+    loop all entities in radius {_power} around {_location}:
+        set {_victim::Tags::*} to get_rpgentity_data(loop-entity)
+        if {_victim::Tags::1} is equal to "rpgentity":
+            set {_victim_id} to {_victim::Tags::2}
+            # melee hit for now.
+            rpgcombat_melee_hit({_attacker}, {_attacker_id}, loop-entity, {_victim_id})
+
+on damage:
+	if attacker is a player:
+		if victim is a player:
+			# rpg damage - player on player
+			set damage to rpgcombat_melee_hit(attacker, {_}, victim, {_})
+		else:
+			set {_victim::Tags::*} to get_rpgentity_data(victim)
+			if {_victim::Tags::1} is equal to "rpgentity":
+				set {_victim_id} to {_victim::Tags::2}
+				# rpg damage - player on rpgentity {_victim_id}
+				set damage to rpgcombat_melee_hit(attacker, {_}, victim, {_victim_id})
+	else:
+		set {_attacker::Tags::*} to get_rpgentity_data(attacker)
+		if {_attacker::Tags::1} is equal to "rpgentity":
+			set {_attacker_id} to {_attacker::Tags::2}
+			if victim is a player:
+				# rpg damage - rpgentity {_attacker_id} on player
+				set damage to rpgcombat_melee_hit(attacker, {_attacker_id}, victim, {_})
+			else:
+				set {_victim::Tags::*} to get_rpgentity_data(victim)
+				if {_victim::Tags::1} is equal to "rpgentity":
+					set {_victim_id} to {_victim::Tags::2}
+					# rpg damage - rpgentity {_attacker_id} on rpgentity {_victim_id}
+					set damage to rpgcombat_melee_hit(attacker, {_attacker_id}, victim, {_victim_id})

@@ -1,0 +1,71 @@
+
+options:
+	level_bar_color_full: "&a"
+	level_bar_color_empty: "&8"
+
+
+function repeat_string(s: text, count: integer) :: text:
+	set {_r} to ""
+	loop {_count} times:
+		set {_r} to "%{_r}%%{_s}%"
+	return {_r}
+
+function get_level_progress_bar(player: player, char: text, total_length: integer) :: text:
+	set {_perc} to {rpgdb::xp::%{_player}'s uuid%} / get_max_xp({rpgdb::level::%{_player}'s uuid%})
+	set {_count_full} to floor({_perc} * {_total_length})
+	return "%{@level_bar_color_full}%%repeat_string({_char}, {_count_full})%%{@level_bar_color_empty}%%repeat_string({_char}, {_total_length} - {_count_full})%"
+
+function get_max_xp(level: integer) :: number:
+	return 2 + (3 * {_level}) + (8 * sqrt({_level}))
+
+function add_xp(player: player, xp: number):
+	if {_xp} is equal to 0:
+		stop
+	add {_xp} to {rpgdb::xp::%{_player}'s uuid%}
+	if {_xp} is greater than 0:
+		set {_xp_for_level} to get_max_xp({rpgdb::level::%{_player}'s uuid%})
+		send "&aYou've gained %{_xp}% xp. (%{rpgdb::xp::%{_player}'s uuid%}% / %get_max_xp({rpgdb::level::%{_player}'s uuid%})%)" to {_player}
+		while {rpgdb::xp::%{_player}'s uuid%} is greater or equal to {_xp_for_level}:
+			add 1 to {rpgdb::level::%{_player}'s uuid%}
+			subtract {_xp_for_level} from {rpgdb::xp::%{_player}'s uuid%}
+			set {_xp_for_level} to get_max_xp({rpgdb::level::%{_player}'s uuid%})
+			
+			play sound "minecraft:entity.player.levelup" with volume 1 with pitch 1.1 to {_player}
+			wait 0.4 seconds
+			play sound "minecraft:entity.player.levelup" with volume 1 with pitch 1.3 to {_player}
+			make 100 of flame at {_player} with offset vector(2, 2, 2) with extra 0.5
+			send "&a&lLevel up!" to {_player}
+			send "&aYou're now level %{rpgdb::level::%{_player}'s uuid%}%" to {_player}
+		sync_mc_level({_player})
+		stop
+	else:
+		set {_xp_for_level} to get_max_xp({rpgdb::level::%{_player}'s uuid%} - 1)
+		send "&cYou've lost %{_xp}% xp. (%{rpgdb::xp::%{_player}'s uuid%}% / %get_max_xp({rpgdb::level::%{_player}'s uuid%})%)" to {_player}
+		while {rpgdb::xp::%{_player}'s uuid%} is smaller or equal to 0:
+			remove 1 from {rpgdb::level::%{_player}'s uuid%}
+			add {_xp_for_level} to {rpgdb::xp::%{_player}'s uuid%}
+			set {_xp_for_level} to get_max_xp({rpgdb::level::%{_player}'s uuid%} - 1)
+			send "&c&lLevel down." to {_player}
+			send "&cYou're now level %{rpgdb::level::%{_player}'s uuid%}%" to {_player}
+		sync_mc_level({_player})
+		stop
+		
+function sync_mc_level(player: player):
+	set {_perc} to {rpgdb::xp::%{_player}'s uuid%} / get_max_xp({rpgdb::level::%{_player}'s uuid%})
+	set {_player}'s level to {rpgdb::level::%{_player}'s uuid%}
+	set level progress of {_player} to {_perc}
+
+on join:
+	if {rpgdb::xp::%player's uuid%} is not set:
+		set {rpgdb::xp::%player's uuid%} to 0
+	if {rpgdb::level::%player's uuid%} is not set:
+		set {rpgdb::level::%player's uuid%} to 1
+	
+
+on death:
+	if attacker is a player:
+		set {_victim::Tags::*} to get_rpgentity_data(victim)
+		set {_mob_id} to {_victim::Tags::2}
+		if {_mob_id} is set:
+			set {_xp} to get_number_in_range({rpg::loot_tabledef::%{rpg::entitydef::%{_mob_id}%::loot_table}%::xp})
+			add_xp(attacker, {_xp})

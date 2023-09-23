@@ -1,0 +1,4 @@
+
+on first join:
+	add create_rpgitem_stack("rotten_branch", {_}, 1, 0) to player
+	add create_rpgitem_stack("rotten_flesh", {_}, 16, 0) to player

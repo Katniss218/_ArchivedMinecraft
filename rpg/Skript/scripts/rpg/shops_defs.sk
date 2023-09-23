@@ -1,0 +1,6 @@
+
+#rpgshops:
+#  misc_trader:
+
+variables:
+	{rpg::shopdef::default::display_name} = "Misc. Trader"

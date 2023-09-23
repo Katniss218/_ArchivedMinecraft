@@ -1,0 +1,14 @@
+
+on script load:
+
+# rpgrarities
+
+	unload yaml "plugins/rpg/defs/rarities.yml"
+	load yaml "plugins/rpg/defs/rarities.yml" as "plugins/rpg/defs/rarities.yml"
+		# loop-value-1 is the file
+	loop yaml nodes with keys "rpgrarities" from "plugins/rpg/defs/rarities.yml":
+		set {_index} to loop-value-1
+		set {rpg::raritydef::%{_index}%} to "" # yaml value <path> from <file>
+		set {rpg::raritydef::%{_index}%::display_name} to yaml value "rpgrarities.%{_index}%.display_name" from "plugins/rpg/defs/rarities.yml"
+		set {rpg::raritydef::%{_index}%::primary_color} to yaml value "rpgrarities.%{_index}%.primary_color" from "plugins/rpg/defs/rarities.yml"
+		set {rpg::raritydef::%{_index}%::secondary_color} to yaml value "rpgrarities.%{_index}%.secondary_color" from "plugins/rpg/defs/rarities.yml"

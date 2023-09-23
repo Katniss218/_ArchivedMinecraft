@@ -1,0 +1,40 @@
+
+on script load:
+
+	# Do not flat remove any variables - people might add weapons via commands, etc. in the future.
+
+	loop all of the currently loaded yaml files: # from directory?
+		unload yaml loop-value
+	load all yaml from directory "plugins/rpg/defs/rpgitems/"
+	loop all of the currently loaded yaml files: # from directory?
+		# loop-value-1 is the file
+		loop yaml nodes with keys "rpgitems" from loop-value-1:
+			set {_id} to loop-value-2
+			set {rpg::itemdef::%{_id}%} to yaml value "rpgitems.%{_id}%.base" from loop-value-1 # yaml value <path> from <file>
+			set {rpg::itemdef::%{_id}%::item_level} to yaml value "rpgitems.%{_id}%.level" from loop-value-1
+			set {rpg::itemdef::%{_id}%::item_type} to yaml value "rpgitems.%{_id}%.item_type" from loop-value-1
+			set {rpg::itemdef::%{_id}%::rarity} to yaml value "rpgitems.%{_id}%.rarity" from loop-value-1
+			set {rpg::itemdef::%{_id}%::display_name} to yaml value "rpgitems.%{_id}%.display.name" from loop-value-1
+			set {rpg::itemdef::%{_id}%::display_description::*} to yaml list "rpgitems.%{_id}%.display.description" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::attack_damage_primary} to yaml value "rpgitems.%{_id}%.parameters.primary.attack_damage" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::attack_damage_additional_flat} to yaml value "rpgitems.%{_id}%.parameters.additional_flat.attack_damage" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::attack_damage_additional_percent} to yaml value "rpgitems.%{_id}%.parameters.additional_percent.attack_damage" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::attack_speed_primary} to yaml value "rpgitems.%{_id}%.parameters.primary.attack_speed" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::attack_speed_additional_flat} to yaml value "rpgitems.%{_id}%.parameters.additional_flat.attack_speed" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::attack_speed_additional_percent} to yaml value "rpgitems.%{_id}%.parameters.additional_percent.attack_speed" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::crit_chance_primary} to yaml value "rpgitems.%{_id}%.parameters.primary.crit_chance" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::crit_chance_additional_flat} to yaml value "rpgitems.%{_id}%.parameters.additional_flat.crit_chance" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::crit_chance_additional_percent} to yaml value "rpgitems.%{_id}%.parameters.additional_percent.crit_chance" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::armor_primary} to yaml value "rpgitems.%{_id}%.parameters.primary.armor" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::armor_additional_flat} to yaml value "rpgitems.%{_id}%.parameters.additional_flat.armor" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::armor_additional_percent} to yaml value "rpgitems.%{_id}%.parameters.additional_percent.armor" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::max_health_primary} to yaml value "rpgitems.%{_id}%.parameters.primary.max_health" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::max_health_additional_flat} to yaml value "rpgitems.%{_id}%.parameters.additional_flat.max_health" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::max_health_additional_percent} to yaml value "rpgitems.%{_id}%.parameters.additional_percent.max_health" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::movement_speed_primary} to yaml value "rpgitems.%{_id}%.parameters.primary.movement_speed" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::movement_speed_additional_flat} to yaml value "rpgitems.%{_id}%.parameters.additional_flat.movement_speed" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::movement_speed_additional_percent} to yaml value "rpgitems.%{_id}%.parameters.additional_percent.movement_speed" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::food_primary} to yaml value "rpgitems.%{_id}%.parameters.primary.food" from loop-value-1
+			set {rpg::itemdef::%{_id}%::params::potions_primary::*} to yaml list "rpgitems.%{_id}%.parameters.primary.potions" from loop-value-1
+			set {rpg::itemdef::%{_id}%::durability} to yaml value "rpgitems.%{_id}%.durability" from loop-value-1
+			set {rpg::itemdef::%{_id}%::value} to yaml value "rpgitems.%{_id}%.value" from loop-value-1

@@ -1,0 +1,43 @@
+rpgitems:
+  rotting_flesh:
+    base: 'rotten flesh'
+    level: 1
+    item_type: 'consumable'
+    rarity: 0
+    display:
+      name: 'Rotting Flesh'
+      description:
+      - '- A disgusting hunk of decaying corpse. Barely'
+      - '  edible.'
+    parameters:
+      primary:
+        food: 2.0
+        potions:
+        - '10|hunger|1|1.0'
+    value: 1
+  bread:
+    base: 'bread'
+    level: 3
+    item_type: 'consumable'
+    rarity: 1
+    display:
+      name: 'Bread'
+      description:
+      - '- A staple low-level food. The humble bread is a'
+      - '  primary food source for many.'
+    parameters:
+      primary:
+        food: 5.0
+    value: 4
+  moldy_bread:
+    base: 'bread'
+    level: 3
+    item_type: 'consumable'
+    rarity: 0
+    display:
+      name: 'Moldy Bread'
+      description:
+    parameters:
+      primary:
+        food: 3.0
+    value: 4

@@ -1,0 +1,27 @@
+
+on consume:
+	set {_nbt} to nbt compound of event-item
+	set {_item_id} to tag "rpg.item_id" of {_nbt}
+	if {rpg::itemdef::%{_item_id}%::params::food_primary} is set:
+		cancel event
+		set the player's food to the player's food + ({rpg::itemdef::%{_item_id}%::params::food_primary} / 2) # Spigot uses 0..10, Minecraft uses 0..20. We use minecraft's.
+		set the player's saturation to the player's saturation + {rpg::itemdef::%{_item_id}%::params::food_primary}
+		if player's gamemode is not creative:
+			if item amount of event-item is 1:
+				remove event-item from player
+			else:
+				if event-item is tool:
+					remove 1 from item amount of tool
+				if event-item is offhand tool:
+					remove 1 from item amount of offhand tool
+	loop {rpg::itemdef::%{_item_id}%::params::potions_primary::*}:
+		cancel event
+		set {_potion::*} to loop-value split at "|"
+		set {_time} to "%{_potion::1}% second" parsed as timespan
+		set {_effect} to {_potion::2} parsed as potion effect type
+		set {_strength} to {_potion::3} parsed as number
+		set {_chance} to {_potion::4}
+		if a random integer between 0 and 99 is less than (({_chance} parsed as number) * 100):
+			#apply {_effect} {_strength} to the player for {_time}
+			# time is broken in skript 2.7.0 and will be fixed later.
+			execute console command "/minecraft:effect give %player's uuid% %{_effect}% %({_potion::1} parsed as number)% %{_strength} - 1%"

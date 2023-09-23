@@ -1,0 +1,30 @@
+
+rpgrarities:
+  0:
+    display_name: 'WORTHLESS'
+    primary_color: '&8'
+    secondary_color: '&7'
+  1:
+    display_name: 'COMMON'
+    primary_color: '&7'
+    secondary_color: '&f'
+  2:
+    display_name: 'UNCOMMON'
+    primary_color: '&1'
+    secondary_color: '&9'
+  3:
+    display_name: 'RARE'
+    primary_color: '&3'
+    secondary_color: '&b'
+  4:
+    display_name: 'EPIC'
+    primary_color: '&6'
+    secondary_color: '&e'
+  5:
+    display_name: 'LEGENDARY'
+    primary_color: '&4'
+    secondary_color: '&c'
+  6:
+    display_name: 'SPECIAL'
+    primary_color: '&5'
+    secondary_color: '&d'

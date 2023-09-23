@@ -1,0 +1,172 @@
+
+function attack_speed_to_text(value: number) :: text:
+	# returns the text representation of an attack speed modifier.
+	if {_value} is smaller than -2.8:
+		return "Slow"
+	if {_value} is smaller than -1.8:
+		return "Normal"
+	if {_value} is smaller than -0.8:
+		return "Fast"
+
+function create_rpgitem_stack(item_id: text, prefix_id: text, amount: integer, context: number) :: item:
+	if {_prefix_id} is not set:
+		set {_item} to {_amount} of ({rpg::itemdef::%{_item_id}%} parsed as item) with nbt from "{tag:{HideFlags:2147483647,rpg.item_id:'%{_item_id}%'}}"
+	else:
+		set {_item} to {_amount} of ({rpg::itemdef::%{_item_id}%} parsed as item) with nbt from "{tag:{HideFlags:2147483647,rpg.item_id:'%{_item_id}%',rpg.prefix_id:'%{_prefix_id}%'}}"
+	if {rpg::itemdef::%{_item_id}%::durability} is set:
+		set int tag "rpg.durability" of nbt compound of {_item} to {rpg::itemdef::%{_item_id}%::durability}
+	set {_item} to sync_rpgitem({_item}, {_context})
+	return {_item}
+	
+function append_primary_property(item_id: text, prefix_id: text, property: text, property_name: text, rarity_primary_color: text) :: texts:
+	# shield symbol: 🛡
+	# swords symbol: ⚔
+	
+	if {rpg::itemdef::%{_item_id}%::params::%{_property}%_primary} is set:
+		set {_base} to {rpg::itemdef::%{_item_id}%::params::%{_property}%_primary}
+		
+		set {_final} to {_base}
+		if {rpg::prefixdef::%{_prefix_id}%::params::%{_property}%_primary} is set:
+			set {_final} to round({_final} * (1+{rpg::prefixdef::%{_prefix_id}%::params::%{_property}%_primary})) # prefixes are percentages.
+		set {_signcolor} to sign_to_color({_final} - {_base})
+		
+		add "&8> %{_rarity_primary_color}%&l%{_property_name}%&8: %{_signcolor}%&l%{_final}%" to {_lore::*}
+		if {rpg::prefixdef::%{_prefix_id}%::params::%{_property}%_primary} is set:
+			add " &8 > %{_signcolor}%%{rpg::prefixdef::%{_prefix_id}%::display_name}%: %number_to_text_with_sign({rpg::prefixdef::%{_prefix_id}%::params::%{_property}%_primary} * 100)%%%" to {_lore::*}
+	return {_lore::*}
+
+function append_secondary_flat_property(item_id: text, prefix_id: text, property: text, property_name: text, rarity_primary_color: text) :: texts:
+	if {rpg::itemdef::%{_item_id}%::params::%{_property}%_additional_flat} is set:
+		set {_signcolor} to sign_to_color({rpg::itemdef::%{_item_id}%::params::%{_property}%_additional_flat})
+		add " %{_signcolor}%&l%number_to_text_with_sign({rpg::itemdef::%{_item_id}%::params::%{_property}%_additional_flat})% %{_rarity_primary_color}%&l%{_property_name}%" to {_lore::*}
+	return {_lore::*}
+
+function append_secondary_percent_property(item_id: text, prefix_id: text, property: text, property_name: text, rarity_primary_color: text) :: texts:
+	if {rpg::itemdef::%{_item_id}%::params::%{_property}%_additional_percent} is set:
+		set {_signcolor} to sign_to_color({rpg::itemdef::%{_item_id}%::params::%{_property}%_additional_percent})
+		add " %{_signcolor}%&l%number_to_text_with_sign({rpg::itemdef::%{_item_id}%::params::%{_property}%_additional_percent} * 100)%%% %{_rarity_primary_color}%&l%{_property_name}%" to {_lore::*}
+	return {_lore::*}
+
+function string_to_integer_hash(value: text) :: integer:
+	set {_slothash} to (the first 6 characters of ({_value} hashed with MD5))
+	replace every "a" with "0" in {_slothash}
+	replace every "b" with "1" in {_slothash}
+	replace every "c" with "2" in {_slothash}
+	replace every "d" with "3" in {_slothash}
+	replace every "e" with "4" in {_slothash}
+	replace every "f" with "5" in {_slothash}
+	return {_slothash} parsed as integer
+
+function sync_rpgitem(item: item, context: integer) :: item:
+	# Syncs the item, so its minecraft values (attributes, display, etc) are what they should be.
+	# context: 0 = inventory
+	#        : 1 = shop (buy)
+	#        : 2 = shop (sell)
+   
+	# name: 'Lv.2 Broken Wooden Sword'
+	# lore:
+	# - '- This sword is made from wood'
+	# - '- This sword has been broken in two'
+	# -
+	# - 'Damage: 5 (4)'
+	#   ' > Broken: -20%
+	# - 'Speed: Normal'
+   
+	set {_item_id} to tag "rpg.item_id" of nbt compound of {_item}
+	set {_prefix_id} to tag "rpg.prefix_id" of nbt compound of {_item}
+
+	# if not rpgitem - guard.
+	if {_item_id} is not set:
+		return {_item}
+
+	set {_speed} to GetRPGItemProperty({_item}, "attack_speed")
+	set {_slothash} to string_to_integer_hash({rpg::itemdef::%{_item_id}%::item_type})
+	set compound list tag "AttributeModifiers" of nbt compound of {_item} to nbt from "{AttributeName:""generic.attack_speed"",Name:""generic.attack_speed"",Amount:%{_speed}%,Operation:0,UUID:[I;44235,2530,%{_slothash}%,-5013638]}" # fixed UUID is important for stacking. non-zero elements are also important, somehow...
+	
+	# add custom nbt support (for display purposes)
+
+	set {_item_level} to {rpg::itemdef::%{_item_id}%::item_level}
+	
+	set {_rarity} to {rpg::itemdef::%{_item_id}%::rarity} + {rpg::prefixdef::%{_prefix_id}%::rarity}
+	if {_rarity} is less than 0:
+		set {_rarity} to 0
+	else if {_rarity} is greater than 6:
+		set {_rarity} to 6
+		
+	set {_item_display_name} to {rpg::itemdef::%{_item_id}%::display_name}
+	set {_prefix_display_name} to {rpg::prefixdef::%{_prefix_id}%::display_name}
+	set {_rarity_primary_color} to {rpg::raritydef::%{_rarity}%::primary_color}
+	set {_rarity_secondary_color} to {rpg::raritydef::%{_rarity}%::secondary_color}
+
+	if {_prefix_id} is not set:
+		set {_display::name} to "%formatted_level({_item_level})% %{_rarity_primary_color}%&l%{_item_display_name}%"
+	else:
+		set {_display::name} to "%formatted_level({_item_level})% %{_rarity_primary_color}%&l%{_prefix_display_name}% %{_item_display_name}%"
+
+	loop {rpg::itemdef::%{_item_id}%::display_description::*}:
+		add "%{_rarity_secondary_color}%%loop-value%" to {_display::lore::*}
+	
+	add "" to {_display::lore::*}
+	add "&8: %{_rarity_primary_color}%&l%{rpg::raritydef::%{_rarity}%::display_name}% %{_rarity_primary_color}%%{_rarity_primary_color}%%{rpg::itemdef::%{_item_id}%::item_type}%" to {_display::lore::*}
+	add "" to {_display::lore::*}
+
+	add append_primary_property({_item_id}, {_prefix_id}, "attack_damage", "Damage", {_rarity_primary_color}) to {_display::lore::*}
+	# commented out due to slightly different formatting
+	#add append_primary_property({_item_id}, {_prefix_id}, "attack_speed", "Speed", {_rarity_primary_color}) to {_display::lore::*}
+	   
+	if {rpg::itemdef::%{_item_id}%::params::attack_speed_primary} is set:
+		set {_speed_base} to {rpg::itemdef::%{_item_id}%::params::attack_speed_primary}
+		set {_speed_final} to {_speed_base}
+		if {rpg::prefixdef::%{_prefix_id}%::params::attack_speed_primary} is set:
+			# prefixes are percentages.
+			set {_speed_final} to round({_speed_final} * (1+{rpg::prefixdef::%{_prefix_id}%::params::attack_speed_primary}))
+		set {_signcolor} to sign_to_color({_speed_final} - {_speed_base})
+		# potentially display a range?
+		add "&8> %{_rarity_primary_color}%&lSpeed&8: %{_signcolor}%&l%attack_speed_to_text({_speed_final})%" to {_display::lore::*}
+		if {rpg::prefixdef::%{_prefix_id}%::params::attack_speed_primary} is set:
+			add " &8 > %{_signcolor}%%{rpg::prefixdef::%{_prefix_id}%::display_name}%: %number_to_text_with_sign({rpg::prefixdef::%{_prefix_id}%::params::attack_speed_primary} * 100)%%%" to {_display::lore::*}
+
+	add append_primary_property({_item_id}, {_prefix_id}, "max_health", "Max Health", {_rarity_primary_color}) to {_display::lore::*}
+	add append_primary_property({_item_id}, {_prefix_id}, "movement_speed", "Movement Speed", {_rarity_primary_color}) to {_display::lore::*}
+	add append_primary_property({_item_id}, {_prefix_id}, "armor", "Armor", {_rarity_primary_color}) to {_display::lore::*}
+	add append_primary_property({_item_id}, {_prefix_id}, "crit_chance", "Crit", {_rarity_primary_color}) to {_display::lore::*}
+	
+	add append_primary_property({_item_id}, {_prefix_id}, "food", "Food", {_rarity_primary_color}) to {_display::lore::*}
+	
+	# conditional spacer
+	
+	add append_secondary_flat_property({_item_id}, {_prefix_id}, "attack_damage", "Attack Damage", {_rarity_primary_color}) to {_display::lore::*}
+	add append_secondary_flat_property({_item_id}, {_prefix_id}, "attack_speed", "Attack Speed", {_rarity_primary_color}) to {_display::lore::*}
+	add append_secondary_flat_property({_item_id}, {_prefix_id}, "max_health", "Max Health", {_rarity_primary_color}) to {_display::lore::*}
+	add append_secondary_flat_property({_item_id}, {_prefix_id}, "movement_speed", "Movement Speed", {_rarity_primary_color}) to {_display::lore::*}
+	add append_secondary_flat_property({_item_id}, {_prefix_id}, "armor", "Armor", {_rarity_primary_color}) to {_display::lore::*}
+	add append_secondary_flat_property({_item_id}, {_prefix_id}, "crit_chance", "Crit Chance", {_rarity_primary_color}) to {_display::lore::*}
+	
+	# conditional spacer
+	
+	add append_secondary_percent_property({_item_id}, {_prefix_id}, "attack_damage", "Attack Damage", {_rarity_primary_color}) to {_display::lore::*}
+	add append_secondary_percent_property({_item_id}, {_prefix_id}, "attack_speed", "Attack Speed", {_rarity_primary_color}) to {_display::lore::*}
+	add append_secondary_percent_property({_item_id}, {_prefix_id}, "max_health", "Max Health", {_rarity_primary_color}) to {_display::lore::*}
+	add append_secondary_percent_property({_item_id}, {_prefix_id}, "movement_speed", "Movement Speed", {_rarity_primary_color}) to {_display::lore::*}
+	add append_secondary_percent_property({_item_id}, {_prefix_id}, "armor", "Armor", {_rarity_primary_color}) to {_display::lore::*}
+	add append_secondary_percent_property({_item_id}, {_prefix_id}, "crit_chance", "Crit Chance", {_rarity_primary_color}) to {_display::lore::*}
+	
+	if {_context} is 1:
+		add "" to {_display::lore::*}
+		add "&a&lBuy (%item amount of {_item}%): ¤%{rpg::itemdef::%{_item_id}%::value} * (item amount of {_item})%" to {_display::lore::*}
+	else if {_context} is 2:
+		add "" to {_display::lore::*}
+		add "&a&lSell (%item amount of {_item}%): ¤%{rpg::itemdef::%{_item_id}%::value} / 5 * (item amount of {_item})%" to {_display::lore::*}
+	# analogous for potion effects.
+	
+	set {_item}'s name to {_display::name}
+	set {_item}'s lore to {_display::lore::*}
+	return {_item}
+
+options:
+	survival_inventory_name: "Crafting"
+
+on join:
+	loop all items in player's inventory:
+		set loop-item to sync_rpgitem(loop-item, 0)
+

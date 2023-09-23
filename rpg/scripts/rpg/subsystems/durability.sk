@@ -1,4 +1,0 @@
-
-on item damage:
-	cancel event
-	# add custom durability later.

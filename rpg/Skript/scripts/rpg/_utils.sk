@@ -1,0 +1,46 @@
+
+options:
+	nopermission_message: "&cI'm sorry, but you don't have permission to perform this command. Please contact the server administrators if you believe that this is an error."
+
+variables:
+	{rpg::signcolor_negative} = "&c"
+	{rpg::signcolor_positive} = "&2"
+	{rpg::signcolor_neutral} = "&6"
+
+function progress_bar(length: integer, fill_percent: number, color1: text, color2: text) :: text:
+	set {_count} to floor({_fill_percent} * {_length})
+	if {_count} = 0:
+		set {_count} to 1
+	return "%{_color1}%%repeat_string("|", {_count})%%{_color2}%%repeat_string("|", {_length} - {_count})%"
+
+function formatted_level(level: number) :: text:
+	return "&a&lLv.%{_level}%"
+
+function sign_to_color(value: number) :: text:
+	if {_value} is smaller than 0:
+		return {rpg::signcolor_negative}
+	if {_value} is greater than 0:
+		return {rpg::signcolor_positive}
+	return {rpg::signcolor_neutral}
+		
+function number_to_text_with_sign(value: number) :: text:
+	if {_value} is smaller than 0:
+		return "%{_value}%"
+	if {_value} is greater than 0:
+		return "+%{_value}%"
+	return "%{_value}%"
+	
+	
+function get_integer_in_range(value: text) :: integer:
+	set {_values::*} to {_value} split at "-"
+	if size of {_values::*} is equal to 2:
+		return random integer between ({_values::1} parsed as integer) and ({_values::2} parsed as integer)
+	if size of {_values::*} is equal to 1:
+		return ({_values::1} parsed as integer)
+
+function get_number_in_range(value: text) :: number:
+	set {_values::*} to {_value} split at "-"
+	if size of {_values::*} is equal to 2:
+		return random number between ({_values::1} parsed as number) and ({_values::2} parsed as number)
+	if size of {_values::*} is equal to 1:
+		return ({_values::1} parsed as number)

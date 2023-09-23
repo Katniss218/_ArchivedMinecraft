@@ -1,0 +1,39 @@
+
+rpgloot_tables:
+  decayed_corpse:
+    money: '2-5'
+    xp: '2-4'
+    items:
+    - '1-2||rotting_flesh|0.66'
+    - '1||rotten_branch,rotten_branch,rusty_dagger|0.5'
+    # '<count_min_max>|<prefix_list>|<item_list>|<chance>'
+    # '2-|pfix1,pfix2|item1,item2|0.5'
+  decrepit_corpse:
+    money: '2-5'
+    xp: '2-4'
+    items:
+    - '1-2||rotting_flesh|0.66'
+    - '1||rotten_branch,rotten_branch,rusty_dagger|0.5'
+  decrepit_skeleton:
+    money: '2-7'
+    xp: '4-8'
+    items:
+    - '1-2||bone_splinters|0.5'
+    - '1||rotten_branch|0.25'
+    - '1||rotten_longbow|0.25'
+  decayed_archer:
+    money: '2-7'
+    xp: '4-8'
+    items:
+    - '1-2||bone_splinters|0.5'
+    - '5-10||arrow|1.0'
+    - '1||rotten_branch|0.25'
+    - '1||rotten_longbow|0.25'
+  undead_general:
+    money: '30-35'
+    xp: '20-30'
+    items:
+    - '1-5||rotting_flesh|1.0'
+    - '1-5||bread|1.0'
+    - '1||rusty_dagger,rotten_longbow|1.0'
+    - '1||rusty_plate_armor|0.2'

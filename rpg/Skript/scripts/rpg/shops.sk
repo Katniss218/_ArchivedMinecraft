@@ -1,0 +1,54 @@
+
+options:
+	shop_name: "Shop"
+
+on rightclick:
+	if clicked entity is villager:
+		open_shop("default", player)
+
+function open_shop(shop_id: text, player: player) :: text:
+	set {_shop_inventory} to a new chest inventory with 5 rows with name "%{@shop_name}%: &2&l%{rpg::shopdef::%{_shop_id}%::display_name}%"
+	set slot 0 of {_shop_inventory} to create_rpgitem_stack("rotten_branch", {_}, 1, 1)
+	open {_shop_inventory} to {_player}
+	send "&aYou're now shopping!" to {_player}
+	loop all items in {_player}'s inventory:
+		set loop-item to sync_rpgitem(loop-item, 2)
+
+on inventory open:
+	# this runs before the inventory name is set to open shop.
+	# after that, it runs for the inventory of the shop.
+	if name of player's inventory is "Crafting":
+		loop all items in player's inventory:
+			set loop-item to sync_rpgitem(loop-item, 0)
+
+on inventory close:
+	if name of player's inventory starts with {@shop_name}:
+		send "&aThanks for shopping!"
+		loop all items in player's inventory:
+			set loop-item to sync_rpgitem(loop-item, 0)
+
+on inventory click:
+	if name of player's inventory starts with {@shop_name}:
+		cancel event
+		if event-item is not set:
+			stop
+		if event-inventory is player's inventory:
+			set {_item_id} to tag "rpg.item_id" of nbt compound of event-item
+			if {_item_id} is not set:
+				stop
+			set {_sell_price} to (item amount of event-item) * {rpg::itemdef::%{_item_id}%::value} / 5
+			send "&aSold %item amount of event-item%x %{rpg::itemdef::%{_item_id}%::display_name}% for ¤%{_sell_price}%"
+			set slot (index of event-slot) of event-inventory to air
+			add {_sell_price} to player's balance
+		else:
+			set {_item_id} to tag "rpg.item_id" of nbt compound of event-item
+			if {_item_id} is not set:
+				stop
+			set {_buy_price} to (item amount of event-item) * {rpg::itemdef::%{_item_id}%::value}
+			if player's balance is less than {_buy_price}:
+				send "&cNot enough money to buy '&6%{rpg::itemdef::%{_item_id}%::display_name}%&c'."
+				stop
+			send "&aBought %item amount of event-item%x %{rpg::itemdef::%{_item_id}%::display_name}% for ¤%{_buy_price}%"
+			add event-item to player's inventory
+			#set slot (index of event-slot) of event-inventory to air # setting to air makes the shop have limited stock.
+			remove {_buy_price} from player's balance

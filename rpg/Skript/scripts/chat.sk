@@ -1,0 +1,3 @@
+
+on chat:
+	set the chat format to " &8&k!%coloured player's prefix%&8&k! &8&k!&2&l%{rpgdb::level::%player's uuid%}%&8&k! &7%player's name% &8• &7%message%"

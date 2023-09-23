@@ -1,0 +1,26 @@
+rpgitems:
+  rotten_longbow:
+    base: 'bow'
+    level: 9
+    item_type: 'weapon'
+    rarity: 1
+    display:
+      name: 'Rotten Longbow'
+      description:
+      - '- A longbow made from decaying ash wood, held'
+      - '  together by twisted vines.'
+    parameters:
+      primary:
+        attack_damage: 9.0
+        crit_chance: 0.05
+    durability: 25
+    value: 10
+  arrow:
+    base: 'arrow'
+    level: 1
+    item_type: 'ammunition'
+    rarity: 1
+    display:
+      name: 'Arrow'
+      description:
+    value: 1

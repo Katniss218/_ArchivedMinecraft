@@ -1,0 +1,20 @@
+
+options:
+	nopermission_message: "&cI'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is an error."
+
+on tab complete for "/rpgloottable":
+	set tab completions for position 1 to "defs"
+	if tab arg-1 = "defs":
+		set tab completions for position 2 to "list"
+
+command /rpgloottable [<text>] [<text>] [<text>] [<text>] [<text>] [<text>] [<text>]:
+	trigger:
+		if arg-1 is "defs":
+			if arg-2 is "list":
+				if player has permission "rpg.rpgloottable.defs.list":
+					send "&aDefined loot tables:" to player
+					loop {rpg::loot_tabledef::*}:
+						send "&7- '&a%loop-index%&7'" to player
+				else:
+					send {@nopermission_message} to player
+				stop
